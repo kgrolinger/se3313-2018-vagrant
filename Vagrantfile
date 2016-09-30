@@ -69,13 +69,17 @@ Vagrant.configure("2") do |config|
   EOF
 
   config.vm.provision "shell", privileged: true, inline: <<-EOF
-    echo "Installing build dependencies: qt5, cmake, ninja, boost"
-    apt-get install -q -y mesa-common-dev
+    echo "Installing build dependencies: ccache, and ninja"
     
     apt-get install -qq -y bash-completion --reinstall
-    apt-get install -qq -y ccache \
-                          ninja-build \
+    apt-get install -qq -y ccache ninja-build \
                           --no-install-recommends
+  EOF
+
+  # Install VSCode 
+  config.vm.provision "shell", privileged: true, inline: <<-EOF
+    wget https://go.microsoft.com/fwlink/?LinkID=760868 -O /tmp/vscode.deb
+    dpkg -i /tmp/vscode.deb
   EOF
   
   config.vm.provision "shell", privileged: true, inline: <<-EOM
@@ -97,5 +101,6 @@ Vagrant.configure("2") do |config|
 
   # Do this last since it's best to make sure everyone else is updated first
   config.vm.provision "shell", privileged: true, inline: "apt-get dist-upgrade -y ; apt-get autoremove --purge -y"
+  
   config.vm.provision :reload
 end # end vagrant file 
