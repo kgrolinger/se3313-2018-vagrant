@@ -27,11 +27,14 @@
 # building the procsim project
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "boxcutter/ubuntu1604-desktop"
+  config.vm.box = "ubuntu/wily64"
+
+  cpu_count = ENV.has_key?("CPUS") ? ENV["CPUS"] : 2
+  memory_count = ENV.has_key?("MEMORY") ? ENV["MEMORY"] : 2048
 
   config.vm.provider "virtualbox" do |vb|
-    vb.cpus = 2
-    vb.memory = 2048
+    vb.cpus = cpu_count
+    vb.memory = memory_count
     
     vb.customize ["modifyvm", :id, "--uartmode1", "file", "procsim-xenial.log" ]
     
@@ -98,6 +101,12 @@ Vagrant.configure("2") do |config|
     
     config.vm.synced_folder WORKSPACE, "/home/vagrant/workspace"
   end
+
+  config.vm.provision "shell", privileged: true, inline: <<-EOF 
+    apt-get install -y ubuntu-desktop \
+                      unity-lens-applications \
+                      unity-lens-files
+  EOF
 
   # Do this last since it's best to make sure everyone else is updated first
   config.vm.provision "shell", privileged: true, inline: "apt-get dist-upgrade -y ; apt-get autoremove --purge -y"
