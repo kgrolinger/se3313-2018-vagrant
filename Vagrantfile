@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 # 
-# Copyright (c) 2016 Kevin Brightwell
+# Copyright (c) 2017 Kevin Brightwell and Daniel Bailey
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy 
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,11 +23,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# This vagrantfile is used for creating a ubuntu trusty environment for 
+# This vagrantfile is used for creating a ubuntu xenial environment for 
 # building the procsim project
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/wily64"
+  config.vm.box = "ubuntu/xenial64"
 
   cpu_count = ENV.has_key?("CPUS") ? ENV["CPUS"] : 2
   memory_count = ENV.has_key?("MEMORY") ? ENV["MEMORY"] : 2048
@@ -81,8 +81,14 @@ Vagrant.configure("2") do |config|
 
   # Install VSCode 
   config.vm.provision "shell", privileged: true, inline: <<-EOF
-    wget https://go.microsoft.com/fwlink/?LinkID=760868 -O /tmp/vscode.deb
-    dpkg -i /tmp/vscode.deb
+    echo "Installing Visual Studio Code"
+	
+    curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+    mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
+    sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
+    
+    apt-get update
+    apt-get install -y code
   EOF
   
   config.vm.provision "shell", privileged: true, inline: <<-EOM
